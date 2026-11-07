@@ -1,0 +1,82 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: AutoLang\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "&Default language"
+msgstr ""
+
+msgid "Always in the default language"
+msgstr ""
+
+msgid "Arabic script text (Arabic, Urdu etc.)"
+msgstr ""
+
+msgid "AutoLang"
+msgstr ""
+
+msgid "Chinese, Japanese and Korean text"
+msgstr ""
+
+msgid "Cyrillic script text (Russian etc.)"
+msgstr ""
+
+msgid "Devanagari script text (Hindi, Marathi etc.)"
+msgstr ""
+
+msgid "Find the language automatically from the script"
+msgstr ""
+
+msgid "In the same language as the nearby text"
+msgstr ""
+
+msgid "Language to set up"
+msgstr ""
+
+msgid "Languages for scripts"
+msgstr ""
+
+msgid "Languages for scripts..."
+msgstr ""
+
+msgid "Latin script text (English etc.)"
+msgstr ""
+
+msgid "Load synthesizers in advance (avoids delay)"
+msgstr ""
+
+msgid "Punctuation level"
+msgstr ""
+
+msgid "Read &numbers in"
+msgstr ""
+
+msgid "Same as NVDA setting"
+msgstr ""
+
+msgid "Synthesizer"
+msgstr ""
+
+msgid "Synthesizer for this language"
+msgstr ""
+
+msgid "Tell the synthesizer which language is being read"
+msgstr ""
+
+msgid ""
+"The {synth} synthesizer could not be started. Please check that it is "
+"installed."
+msgstr ""
+
+msgid "Voice, rate, pitch and other settings..."
+msgstr ""
+
+msgid "{language} - settings of {synth}"
+msgstr ""
+
+msgid "{language}: {setting}"
+msgstr ""
