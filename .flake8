@@ -1,0 +1,4 @@
+[flake8]
+builtins = _
+max-line-length = 200
+exclude = .git,dist,addon/synthDrivers/AutoLang/scripts.py
