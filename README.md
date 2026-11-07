@@ -1,88 +1,80 @@
 # AutoLang
 
-**A multilingual virtual speech synthesizer for the [NVDA](https://www.nvaccess.org/) screen reader.**
+**A Multilingual Virtual Speech Synthesizer for the [NVDA](https://www.nvaccess.org/) Screen Reader**
 
 ![License](https://img.shields.io/badge/license-GPL--2.0-blue)
 ![NVDA](https://img.shields.io/badge/NVDA-2023.2%20to%202027.1-green)
 
-AutoLang finds the language of a text from its writing script and reads each part with the synthesizer, voice, rate, pitch, volume and punctuation level that **you** chose for that language. A line that mixes Kannada, Hindi and English is read by three different voices, without any manual switching.
+**AutoLang** dynamically detects the language of input text based on its Unicode script character set and routes discrete segments to designated synthesizers, voices, rate profiles, pitch profiles, volume levels, and punctuation thresholds configured for each script. For instance, a single continuous line containing a mix of Kannada, Hindi, and English is processed sequentially through three distinct text-to-speech engines without manual intervention.
 
-## Features
+---
 
-- **Automatic language switching** based on Unicode scripts, including Kannada, Hindi, Tamil, Telugu, Malayalam, Bengali, Gujarati, Gurmukhi, Odia, Sinhala, Latin, Cyrillic, Arabic, Chinese, Japanese, Korean and many more.
-- **A different synthesizer for every language.** Use eSpeak NG, IBMTTS (Eloquence), Vocalizer, Windows OneCore, SAPI 5 or any other installed NVDA synthesizer, side by side.
-- **Per-language settings:** voice, variant, pitch, rate, volume, punctuation level, and every setting that is specific to the chosen synthesizer (inflection, rate boost, head size, roughness, breathiness and so on). Only the settings that the synthesizer really has are shown.
-- **Only what fits the language.** For a language, only the synthesizers that can speak it are offered, and only the voices that speak it.
-- **Simple settings in NVDA's Speech panel,** with separate windows for the synthesizer settings and for the languages of shared scripts such as Latin and Devanagari.
-- **NVDA settings ring support:** change the synthesizer, voice, variant, pitch, rate and volume of a language quickly from the keyboard.
-- **No pauses.** Synthesizers are started in the background after NVDA starts, so the first switch to a language is instant. A synthesizer that fails to start never stops NVDA from speaking.
-- **Safe at startup:** AutoLang never prevents NVDA from starting with it as the chosen synthesizer.
+## Key Features
 
-## Requirements
+- **Automated Script-Based Language Switching:** Supports real-time Unicode script recognition across Kannada, Hindi, Tamil, Telugu, Malayalam, Bengali, Gujarati, Gurmukhi, Odia, Sinhala, Latin, Cyrillic, Arabic, Chinese, Japanese, Korean, and various other global writing systems.
+- **Independent Per-Language Synthesizer Routing:** Assign individual engines—such as eSpeak NG, IBMTTS (Eloquence), Vocalizer, Windows OneCore, SAPI 5, or any standard NVDA-compatible driver—simultaneously across different scripts.
+- **Granular Parameter Customisation:** Configurable per-language parameters include voice selection, voice variant, pitch, speaking rate, master volume, punctuation verbosity, and engine-specific parameters (e.g., inflection, rate boost, head size, roughness, breathiness). Interface controls adapt dynamically to display only supported parameters for a given engine.
+- **Context-Aware Engine Filtering:** Offers only speech engines and localized voices capable of processing the targeted language profile.
+- **Native NVDA Integration:** Integrated directly into NVDA’s Speech settings panel, complemented by dedicated modular dialogs for managing engine properties and script-to-language mappings (e.g., Latin, Devanagari).
+- **NVDA Settings Ring Integration:** Modify synthesizer, voice profile, pitch, rate, and volume parameters on the fly via standard desktop shortcuts.
+- **Asynchronous Engine Initialization:** Initializes engines non-blockingly in the background following NVDA startup, eliminating delay during initial language switches. Faulty or non-responsive engines are isolated to prevent core screen-reader disruption.
+- **Fail-Safe Startup Architecture:** Engineered to ensure NVDA remains operational under all startup conditions, even if initialized as the active default synthesizer.
 
-- NVDA 2023.2 or newer (checked against the NVDA 2025.3, 2026.3 and development sources, which cover the 2026.4 and 2027.1 line).
-- At least one other synthesizer, for example the eSpeak NG that comes with NVDA.
+---
+
+## System Requirements
+
+- **NVDA Version:** 2023.2 or newer (tested against NVDA 2025.3, 2026.3, and active development builds up to the 2026.4 / 2027.1 cycle).
+- **Dependencies:** Requires at least one secondary speech synthesizer engine installed (e.g., bundled eSpeak NG).
+
+---
 
 ## Installation
 
-1. Download `AutoLang-V<version>.nvda-addon` from the [Releases](../../releases) page.
-2. Open the file. NVDA asks to install it. Restart NVDA when asked.
-3. Press `NVDA+Control+S`, choose **AutoLang** and press OK.
+1. Download the latest `AutoLang-V<version>.nvda-addon` package from the [Releases](../../releases) directory.
+2. Execute the file to prompt NVDA installation, and confirm the application restart.
+3. Open the synthesizer selection dialog using `NVDA+Control+S`, select **AutoLang**, and confirm with **OK**.
 
-## Quick start
+---
 
-1. Press `NVDA+Control+V` to open the Speech settings.
-2. In **Language to set up**, choose a language, for example Kannada.
-3. In **Synthesizer for this language**, choose the synthesizer.
-4. Press **Voice, rate, pitch and other settings...** and choose the voice and the other settings in the window that opens. Press OK.
-5. Repeat for every language you read. Press **Languages for scripts...** to choose which language is used for Latin, Cyrillic, Arabic, Devanagari and CJK text.
-6. Press OK in the Speech settings.
+## Quick Start Guide
 
-The full guide is in [`addon/doc/en/readme.md`](addon/doc/en/readme.md).
+1. Launch Speech Settings via `NVDA+Control+V`.
+2. Locate **Language to set up** and select your target language (e.g., **Kannada**).
+3. Under **Synthesizer for this language**, assign your preferred engine.
+4. Click **Voice, rate, pitch and other settings...** to configure engine-specific parameters in the pop-up modal, then confirm with **OK**.
+5. Repeat the process for required language profiles. Utilize **Languages for scripts...** to assign primary language mappings for shared scripts (e.g., Latin, Cyrillic, Arabic, Devanagari, CJK).
+6. Click **OK** to commit changes within NVDA Speech Settings.
 
-## How it works
+For comprehensive configuration guidelines, refer to the full documentation at [`addon/doc/en/readme.md`](addon/doc/en/readme.md).
 
-AutoLang is an NVDA synthesizer driver. It does not make sound by itself. It splits the speech into pieces by language and passes every piece to the nested synthesizer of that language.
+---
 
-| Part | File | Job |
-| --- | --- | --- |
-| Driver | `addon/synthDrivers/AutoLang/__init__.py` | Splits speech by language, runs the nested synthesizers, keeps the settings, builds the settings ring |
-| Language detection | `addon/synthDrivers/AutoLang/languageDetection.py`, `scripts.py` | Finds the language of text from the Unicode script of its characters |
-| Settings windows | `addon/synthDrivers/AutoLang/settingsUi.py` | The controls in the Speech panel and the two settings windows |
+## Architecture & Implementation
 
-Design decisions worth knowing:
+AutoLang functions as a virtual driver layer for NVDA speech synthesis. Rather than producing audio natively, it parses incoming text strings into discrete language tokens and dispatches them to their corresponding underlying synthesizer instances.
 
-- NVDA starts the synthesizer *before* its window system exists. AutoLang therefore does nothing with windows at that time, and starts its background work and its Speech panel controls later.
-- The list of settings that NVDA reads from the driver (`supportedSettings`) stays fixed for NVDA's Speech panel. The per-language settings live in AutoLang's own windows, so NVDA's panel never needs to be rebuilt. Only the settings ring gets a longer list, and only while it is being built.
-- A synthesizer's languages are read from the `language` of its voices. A synthesizer that does not report languages is offered for every language.
+| Component | Target File | Core Functionality |
+| :--- | :--- | :--- |
+| **Driver Engine** | `addon/synthDrivers/AutoLang/__init__.py` | Executes text parsing, orchestrates child engine instances, manages parameter state, and populates the settings ring. |
+| **Language Detection** | `addon/synthDrivers/AutoLang/languageDetection.py`<br>`addon/synthDrivers/AutoLang/scripts.py` | Performs character-level Unicode script analysis to determine language boundaries. |
+| **User Interface** | `addon/synthDrivers/AutoLang/settingsUi.py` | Manages Speech panel integration and auxiliary configuration dialogs. |
 
-## Building
+### Technical Considerations
 
-```
-pip install markdown polib      # optional: builds the guide and the translations
+- **Lifecycle Synchronization:** NVDA initializes speech drivers prior to rendering window systems. AutoLang defers GUI component initialization and background process invocation until the GUI loop active state is confirmed.
+- **Fixed Interface Signatures:** AutoLang maintains a constant `supportedSettings` registration within NVDA’s master Speech panel to maintain UI stability. Specific per-language parameters are handled within secondary dedicated interface modals, updating the settings ring dynamically during runtime.
+- **Capability Discovery:** Driver language compatibility is derived from metadata reported by individual voice profiles. Synthesizers omitting language tags are treated as universal fallback engines.
+
+---
+
+## Build System
+
+To compile the add-on from source:
+
+```bash
+# Optional dependencies for rendering documentation and localization files
+pip install markdown polib
+
+# Execute build workflow
 python build.py
-```
-
-The add-on is written to `dist/AutoLang-V<version>.nvda-addon`.
-
-## Tests
-
-```
-python -m unittest discover -s tests -v
-```
-
-The tests of the language detection do not need NVDA. The driver and the settings windows depend on NVDA itself and must be tried in NVDA.
-
-## Translations
-
-`translations/AutoLang.pot` lists the text of the user interface. Translations are in `addon/locale/<language>/LC_MESSAGES/nvda.po`. Russian and Kannada are included.
-
-## Contributing
-
-Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first. When you report a problem, add the lines of the NVDA log (`NVDA+F1`) that contain the word `AutoLang`.
-
-## Credits and license
-
-- Made and maintained by **Dr. Narayan B Raikar**.
-- Based on **MultiLang** by **Alexander Linkov (Kvark)**: <https://gitverse.ru/kvark128/MultiLang>. AutoLang keeps his language detection and the idea of a virtual synthesizer that switches languages, and extends them.
-- Licensed under the **GNU General Public License, version 2**. See [LICENSE](LICENSE).
