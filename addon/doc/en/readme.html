@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AutoLang</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<h1>AutoLang</h1>
+<p>Version 2026.11.12</p>
+<p>AutoLang is a multilingual virtual speech synthesizer for NVDA. It finds the language of the text from its script (for example Kannada, Hindi, Tamil or English letters) and reads each part in the right language. For every language you can choose a different synthesizer, voice, rate, pitch and volume.</p>
+<h2>Credits</h2>
+<ul>
+<li>AutoLang is made and maintained by <strong>Dr. Narayan B Raikar</strong>.</li>
+<li>It is based on the <strong>MultiLang</strong> add-on written by <strong>Alexander Linkov (Kvark)</strong>. Please support the original author.<ul>
+<li>Original project: <a href="https://gitverse.ru/kvark128/MultiLang">https://gitverse.ru/kvark128/MultiLang</a></li>
+<li>Original author's e-mail: kvark128@yandex.ru</li>
+</ul>
+</li>
+<li>License: GNU General Public License (see the file COPYING.txt).</li>
+</ul>
+<h2>How to start</h2>
+<ol>
+<li>Press NVDA+Control+S, choose <strong>AutoLang</strong> and press OK.</li>
+<li>Press NVDA+Control+V to open the Speech settings.</li>
+<li>Set up each language you need, as given below.</li>
+<li>Press OK. Your settings are saved.</li>
+</ol>
+<h2>The Speech settings</h2>
+<p>When AutoLang is your synthesizer, the Speech settings have these controls, in this order:</p>
+<ol>
+<li><strong>Default language</strong>: the main language of NVDA. It is also used for text that has no script of its own, such as numbers and symbols.</li>
+<li><strong>Language to set up</strong>: choose the language you want to set up, for example Kannada. This does not change the default language.</li>
+<li><strong>Synthesizer for this language</strong>: the synthesizer that will read this language. Only the synthesizers that can speak the language are shown. The first time, AutoLang has to start your synthesizers to find out their languages. It tells you "Checking the synthesizers. Please wait." This can take a few seconds. The answer is remembered for a week, so it is quick afterwards.</li>
+<li><strong>Voice, rate, pitch and other settings</strong> button: opens a separate window (see below).</li>
+<li><strong>Additional language script configuration</strong> button: opens a separate window (see below).</li>
+<li><strong>Read numbers in</strong>: "Always in the default language" or "In the same language as the nearby text".</li>
+<li><strong>Read symbols in</strong>: "Always in the default language" or "In the language of the text". Symbols are the signs such as comma and question mark that NVDA reads aloud as words. With the second choice, the name of the symbol is spoken in the language of the text around it (if NVDA has symbol names for that language).</li>
+</ol>
+<p>The other Speech settings of NVDA are below these.</p>
+<h2>Voice, rate, pitch and other settings window</h2>
+<p>Press the button after the synthesizer list. A window opens for the language and synthesizer you chose. It shows these settings, in this order:</p>
+<ol>
+<li><strong>Voice</strong>: only the voices that speak this language are shown. If the synthesizer does not tell the language of its voices, all voices are shown.</li>
+<li><strong>Variant</strong></li>
+<li><strong>Pitch</strong>, <strong>Rate</strong> and <strong>Volume</strong></li>
+<li><strong>Punctuation level</strong>: Same as NVDA setting, none, some, most or all. Each language can have its own level, and it is used for text written in that language.</li>
+<li><strong>Other settings of the synthesizer</strong>: for example language, inflection, rate boost, head size, roughness and breathiness. You see only the settings that your synthesizer has.</li>
+<li><strong>Tell the synthesizer which language is being read</strong>: keep this on, unless your synthesizer has a problem with it.</li>
+</ol>
+<p>Press OK to go back to the Speech settings. Press Cancel to leave this window without changes. Your choices are saved when you press OK in the Speech settings.</p>
+<h2>Additional language script configuration window</h2>
+<p>This window has settings that are for all languages:</p>
+<ol>
+<li><strong>Find the language automatically from the script</strong>: switch automatic language detection on or off. Keep it on to let AutoLang switch languages by itself.</li>
+<li><strong>Load synthesizers in advance (avoids delay)</strong>: see "Speed" below.</li>
+<li><strong>The language for each shared script.</strong> Many languages share one script. For example, English, German and French all use Latin letters, and Hindi and Marathi both use Devanagari. Here you choose the language that is used for each of these scripts: Latin, Cyrillic, Arabic, Devanagari, and Chinese, Japanese and Korean. Kannada, Tamil, Telugu and other scripts that belong to one language need no choice.</li>
+</ol>
+<h2>Settings ring</h2>
+<p>Use NVDA+Control+Left or Right arrow to move between the settings, and NVDA+Control+Up or Down arrow to change the value. If your NVDA key is CapsLock, use CapsLock+Control+arrows.</p>
+<p>The ring works on the language chosen in "Language to set up". It has:</p>
+<ol>
+<li>Language to set up</li>
+<li>Synthesizer</li>
+<li>Voice</li>
+<li>Variant</li>
+<li>Pitch</li>
+<li>Rate</li>
+<li>Volume</li>
+<li>Default language</li>
+</ol>
+<p>The ring starts on Rate. When you change the language or the synthesizer in the ring, the next items change to match. A synthesizer without variants has no Variant item. Ring changes are saved when NVDA saves its settings (press NVDA+Control+C, or turn on "Save configuration on exit" in General settings).</p>
+<h2>Speed</h2>
+<p>A moment after NVDA starts, AutoLang loads the synthesizers you chose, one by one in the background. So there is no delay when a language is used for the first time. You can switch this off in the additional language script configuration window. If a synthesizer cannot start, AutoLang keeps speaking with the synthesizer of the default language (or eSpeak NG) and tries again after one minute.</p>
+<h2>If you used MultiLang before</h2>
+<p>The first time AutoLang starts, it copies your synthesizer choices from MultiLang. After that, please remove the MultiLang add-on. Voice, rate, pitch and volume must be set again. Settings profiles are not used any more.</p>
+<h2>If something goes wrong</h2>
+<ul>
+<li>Open the NVDA log (NVDA+F1) and find lines with the word "AutoLang". Send these lines to the person who maintains the add-on.</li>
+<li>To keep AutoLang after restarting NVDA, save your settings: press NVDA+Control+C, or turn on "Save configuration on exit" in General settings.</li>
+</ul>
+</body>
+</html>

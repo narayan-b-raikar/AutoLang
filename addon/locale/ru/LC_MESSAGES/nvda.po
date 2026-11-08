@@ -1,0 +1,92 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: AutoLang\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "&Default language"
+msgstr "&Язык по умолчанию"
+
+msgid "Additional language script configuration"
+msgstr "Дополнительная настройка языков письменностей"
+
+msgid "Additional language script configuration..."
+msgstr "Дополнительная настройка языков письменностей..."
+
+msgid "Always in the default language"
+msgstr "Всегда на языке по умолчанию"
+
+msgid "Arabic script text (Arabic, Urdu etc.)"
+msgstr "Текст на арабской письменности (арабский, урду и др.)"
+
+msgid "AutoLang"
+msgstr "AutoLang"
+
+msgid "Checking the synthesizers. Please wait."
+msgstr "Проверка синтезаторов. Пожалуйста, подождите."
+
+msgid "Chinese, Japanese and Korean text"
+msgstr "Китайский, японский и корейский текст"
+
+msgid "Cyrillic script text (Russian etc.)"
+msgstr "Текст на кириллице (русский и др.)"
+
+msgid "Devanagari script text (Hindi, Marathi etc.)"
+msgstr "Текст на деванагари (хинди, маратхи и др.)"
+
+msgid "Find the language automatically from the script"
+msgstr "Определять язык автоматически по письменности"
+
+msgid "In the language of the text"
+msgstr "На языке текста"
+
+msgid "In the same language as the nearby text"
+msgstr "На языке соседнего текста"
+
+msgid "Language to set up"
+msgstr "Язык для настройки"
+
+msgid "Latin script text (English etc.)"
+msgstr "Текст на латинице (английский и др.)"
+
+msgid "Load synthesizers in advance (avoids delay)"
+msgstr "Загружать синтезаторы заранее (без задержек)"
+
+msgid "Punctuation level"
+msgstr "Уровень пунктуации"
+
+msgid "Read &numbers in"
+msgstr "Читать &цифры на"
+
+msgid "Read &symbols in"
+msgstr "Читать &символы на"
+
+msgid "Same as NVDA setting"
+msgstr "Как в настройках NVDA"
+
+msgid "Synthesizer"
+msgstr "Синтезатор"
+
+msgid "Synthesizer for this language"
+msgstr "Синтезатор для этого языка"
+
+msgid "Tell the synthesizer which language is being read"
+msgstr "Сообщать синтезатору, на каком языке идёт чтение"
+
+msgid ""
+"The {synth} synthesizer could not be started. Please check that it is "
+"installed."
+msgstr ""
+"Не удалось запустить синтезатор {synth}. Проверьте, что он установлен."
+
+msgid "Voice, rate, pitch and other settings..."
+msgstr "Голос, скорость, высота и другие настройки..."
+
+msgid "{language} - settings of {synth}"
+msgstr "{language} - настройки {synth}"
+
+msgid "{language}: {setting}"
+msgstr "{language}: {setting}"
