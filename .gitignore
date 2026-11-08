@@ -1,7 +1,0 @@
-dist/
-__pycache__/
-*.pyc
-*.nvda-addon
-.venv/
-.idea/
-.vscode/
