@@ -2,6 +2,21 @@
 
 All notable changes to AutoLang are listed here. Versions are written as `year.month.number`.
 
+## 2026.11.13
+
+### Changed
+- **AutoLang settings now have a window of their own, in NVDA's Tools menu** ("AutoLang settings..."). It replaces the extra controls that were inside NVDA's Speech settings. NVDA's Speech settings now show only the default language for AutoLang. The menu item exists only while AutoLang is the synthesizer.
+- The window holds: default language, language to set up, synthesizer for that language, the two buttons (voice, rate, pitch and other settings; additional language script configuration), read numbers in, and read symbols in. OK saves; Cancel forgets the changes made in the window.
+- The list of synthesizers for a language is now instant. AutoLang finds out the languages that the synthesizers speak in the background after NVDA starts (one synthesizer at a time, each stopped after it is checked) and remembers the answer for a week. A synthesizer that could not be started is not tried again for a day. Synthesizers that are not checked yet are listed for every language.
+- "Read numbers in" and "Read symbols in" are saved by AutoLang itself under the same names as before.
+
+### Added
+- **None** for the voice, the variant and the language setting of a synthesizer. It is selected when nothing was chosen. It means: use the synthesizer's own value (for the voice: the own voice if it speaks the language, otherwise the first voice that does).
+
+### Fixed
+- A language that did not choose a variant or voice could keep the variant or voice that another language had set on the same synthesizer.
+- The delay when choosing a language and moving to the list of synthesizers.
+
 ## 2026.11.12
 
 ### Added

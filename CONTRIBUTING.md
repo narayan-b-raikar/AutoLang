@@ -23,7 +23,7 @@ python -m unittest discover -s tests -v
 python build.py
 ```
 
-- Install the built add-on in NVDA and check at least: starting NVDA with AutoLang chosen, the Speech settings, both settings windows, Cancel and OK, and speaking text that mixes two languages.
+- Install the built add-on in NVDA and check at least: starting NVDA with AutoLang chosen (and restarting it), the AutoLang settings item in the Tools menu, the three windows, Cancel and OK, and speaking text that mixes two languages.
 
 ## Translations
 

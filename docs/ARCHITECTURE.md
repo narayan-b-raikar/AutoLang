@@ -23,12 +23,12 @@ Other keys of `[speech][AutoLang]`:
 | Key | Meaning |
 | --- | --- |
 | `voice` | Default language |
-| `numberMode`, `symbolMode` | Language used for numbers and for the names of symbols |
+| `numberMode`, `symbolMode` | Language used for numbers and for the names of symbols (saved by AutoLang itself) |
 | `scriptLanguages` | JSON with the languages of the shared scripts |
-| `useUnicodeLanguageDetection`, `preloadSynths` | Options of the additional language script configuration window |
-| `synthLanguages` | JSON with the languages that each synthesizer speaks, and when this was found out. Trusted for a week, so that synthesizers need not be started to answer "which synthesizers can speak this language" |
+| `useUnicodeLanguageDetection`, `preloadSynths` | Options of the additional language script configuration window (saved by AutoLang itself) |
+| `synthLanguages` | JSON with the languages that each synthesizer speaks, and when this was found out. Trusted for a week (a failure for a day), so that the list of synthesizers for a language can be shown without starting any synthesizer |
 
-NVDA reads a driver's `supportedSettings` to build the Speech panel and to save and load settings. AutoLang keeps this list fixed (default language, number mode, symbol mode). The settings that depend on the language and the synthesizer are shown by `settingsUi.py` in separate controls and windows.
+NVDA reads a driver's `supportedSettings` to build the Speech panel and to save and load settings. AutoLang keeps this list to the default language. Everything else is in the windows of `settingsUi.py`, which is opened from the Tools menu.
 
 ## Settings ring
 
@@ -44,4 +44,4 @@ NVDA turns punctuation into words before the text reaches the synthesizer, with 
 
 ## Start order
 
-NVDA creates the synthesizer before its window system. `initSettings` must not fail and must not use `wx`. `_startLater` finishes the work when the window system exists: it adds the controls to the Speech panel (`settingsUi.install`), starts the background loading of the synthesizers and builds the settings ring.
+NVDA creates the synthesizer before its window system. `initSettings` must not fail and must not use `wx`. `_startLater` finishes the work when the window system exists: it adds the "AutoLang settings..." item to the Tools menu (`settingsUi.install`, retried until NVDA has created its menus), starts the background loading of the synthesizers in use, then the background check of the other synthesizers, and builds the settings ring.

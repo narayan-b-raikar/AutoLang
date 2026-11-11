@@ -25,14 +25,30 @@ msgstr "Текст на арабской письменности (арабск�
 msgid "AutoLang"
 msgstr "AutoLang"
 
-msgid "Checking the synthesizers. Please wait."
-msgstr "Проверка синтезаторов. Пожалуйста, подождите."
+msgid "AutoLang is not the current synthesizer."
+msgstr "AutoLang сейчас не является текущим синтезатором."
+
+msgid "AutoLang settings"
+msgstr "Настройки AutoLang"
+
+msgid "AutoLang settings..."
+msgstr "Настройки AutoLang..."
 
 msgid "Chinese, Japanese and Korean text"
 msgstr "Китайский, японский и корейский текст"
 
+msgid ""
+"Choose the synthesizer, voice and other settings that AutoLang uses for each"
+" language"
+msgstr ""
+"Выберите синтезатор, голос и другие настройки, которые AutoLang использует "
+"для каждого языка"
+
 msgid "Cyrillic script text (Russian etc.)"
 msgstr "Текст на кириллице (русский и др.)"
+
+msgid "Default language"
+msgstr "Язык по умолчанию"
 
 msgid "Devanagari script text (Hindi, Marathi etc.)"
 msgstr "Текст на деванагари (хинди, маратхи и др.)"
@@ -55,14 +71,17 @@ msgstr "Текст на латинице (английский и др.)"
 msgid "Load synthesizers in advance (avoids delay)"
 msgstr "Загружать синтезаторы заранее (без задержек)"
 
+msgid "None"
+msgstr "Нет"
+
 msgid "Punctuation level"
 msgstr "Уровень пунктуации"
 
-msgid "Read &numbers in"
-msgstr "Читать &цифры на"
+msgid "Read numbers in"
+msgstr "Читать цифры на"
 
-msgid "Read &symbols in"
-msgstr "Читать &символы на"
+msgid "Read symbols in"
+msgstr "Читать символы на"
 
 msgid "Same as NVDA setting"
 msgstr "Как в настройках NVDA"

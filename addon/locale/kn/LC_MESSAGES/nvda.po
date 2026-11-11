@@ -25,14 +25,30 @@ msgstr "ಅರೇಬಿಕ್ ಲಿಪಿ ಪಠ್ಯ (ಅರೇಬಿಕ್, 
 msgid "AutoLang"
 msgstr "AutoLang"
 
-msgid "Checking the synthesizers. Please wait."
-msgstr "ಸಿಂಥಸೈಸರ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ. ದಯವಿಟ್ಟು ಕಾಯಿರಿ."
+msgid "AutoLang is not the current synthesizer."
+msgstr "AutoLang ಪ್ರಸ್ತುತ ಸಿಂಥಸೈಸರ್ ಅಲ್ಲ."
+
+msgid "AutoLang settings"
+msgstr "AutoLang ಸೆಟ್ಟಿಂಗ್‌ಗಳು"
+
+msgid "AutoLang settings..."
+msgstr "AutoLang ಸೆಟ್ಟಿಂಗ್‌ಗಳು..."
 
 msgid "Chinese, Japanese and Korean text"
 msgstr "ಚೈನೀಸ್, ಜಪಾನೀಸ್ ಮತ್ತು ಕೊರಿಯನ್ ಪಠ್ಯ"
 
+msgid ""
+"Choose the synthesizer, voice and other settings that AutoLang uses for each"
+" language"
+msgstr ""
+"ಪ್ರತಿ ಭಾಷೆಗೆ AutoLang ಬಳಸುವ ಸಿಂಥಸೈಸರ್, ಧ್ವನಿ ಮತ್ತು ಇತರ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು "
+"ಆರಿಸಿ"
+
 msgid "Cyrillic script text (Russian etc.)"
 msgstr "ಸಿರಿಲಿಕ್ ಲಿಪಿ ಪಠ್ಯ (ರಷ್ಯನ್ ಇತ್ಯಾದಿ)"
+
+msgid "Default language"
+msgstr "ಡೀಫಾಲ್ಟ್ ಭಾಷೆ"
 
 msgid "Devanagari script text (Hindi, Marathi etc.)"
 msgstr "ದೇವನಾಗರಿ ಲಿಪಿ ಪಠ್ಯ (ಹಿಂದಿ, ಮರಾಠಿ ಇತ್ಯಾದಿ)"
@@ -55,14 +71,17 @@ msgstr "ಲ್ಯಾಟಿನ್ ಲಿಪಿ ಪಠ್ಯ (ಇಂಗ್ಲಿ�
 msgid "Load synthesizers in advance (avoids delay)"
 msgstr "ಸಿಂಥಸೈಸರ್‌ಗಳನ್ನು ಮೊದಲೇ ಲೋಡ್ ಮಾಡಿ (ವಿಳಂಬ ತಪ್ಪಿಸಲು)"
 
+msgid "None"
+msgstr "ಯಾವುದೂ ಇಲ್ಲ"
+
 msgid "Punctuation level"
 msgstr "ವಿರಾಮಚಿಹ್ನೆ ಮಟ್ಟ"
 
-msgid "Read &numbers in"
-msgstr "&ಅಂಕೆಗಳನ್ನು ಓದುವ ಭಾಷೆ"
+msgid "Read numbers in"
+msgstr "ಅಂಕೆಗಳನ್ನು ಓದುವ ಭಾಷೆ"
 
-msgid "Read &symbols in"
-msgstr "&ಚಿಹ್ನೆಗಳನ್ನು ಓದುವ ಭಾಷೆ"
+msgid "Read symbols in"
+msgstr "ಚಿಹ್ನೆಗಳನ್ನು ಓದುವ ಭಾಷೆ"
 
 msgid "Same as NVDA setting"
 msgstr "NVDA ಸೆಟ್ಟಿಂಗ್‌ನಂತೆಯೇ"

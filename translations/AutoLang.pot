@@ -25,13 +25,27 @@ msgstr ""
 msgid "AutoLang"
 msgstr ""
 
-msgid "Checking the synthesizers. Please wait."
+msgid "AutoLang is not the current synthesizer."
+msgstr ""
+
+msgid "AutoLang settings"
+msgstr ""
+
+msgid "AutoLang settings..."
 msgstr ""
 
 msgid "Chinese, Japanese and Korean text"
 msgstr ""
 
+msgid ""
+"Choose the synthesizer, voice and other settings that AutoLang uses for each"
+" language"
+msgstr ""
+
 msgid "Cyrillic script text (Russian etc.)"
+msgstr ""
+
+msgid "Default language"
 msgstr ""
 
 msgid "Devanagari script text (Hindi, Marathi etc.)"
@@ -55,13 +69,16 @@ msgstr ""
 msgid "Load synthesizers in advance (avoids delay)"
 msgstr ""
 
+msgid "None"
+msgstr ""
+
 msgid "Punctuation level"
 msgstr ""
 
-msgid "Read &numbers in"
+msgid "Read numbers in"
 msgstr ""
 
-msgid "Read &symbols in"
+msgid "Read symbols in"
 msgstr ""
 
 msgid "Same as NVDA setting"

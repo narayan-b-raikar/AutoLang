@@ -61,6 +61,10 @@ SYMBOLS_DEFAULT = "default"
 SYMBOLS_TEXT = "text"
 # What AutoLang learned about the languages of a synthesizer is trusted for this long
 SYNTH_LANGUAGES_MAX_AGE = 7 * 24 * 3600  # seconds
+# A synthesizer that could not be started is not tried again for this long
+SYNTH_FAILURE_MAX_AGE = 24 * 3600  # seconds
+# Settings of a synthesizer that can be left unchosen ("None"): the synthesizer's own value is used
+NONE_SETTINGS = ("voice", "variant", "language")
 # Value of the punctuation list that means "use the level of NVDA"
 LEVEL_NVDA = -1
 # The language support of a synthesizer is not known
@@ -121,6 +125,8 @@ scriptLanguages = string(default="")
 synthLanguages = string(default="")
 useUnicodeLanguageDetection = boolean(default=True)
 preloadSynths = boolean(default=True)
+numberMode = string(default="default")
+symbolMode = string(default="default")
 
 [languages]
 	[[__many__]]
@@ -349,6 +355,8 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		self._preloadQueue = []
 		self._preloadRunning = False
 		self._preloadWanted = False
+		# Synthesizers whose languages are not known yet. They are started one by one, then stopped
+		self._probeQueue = []
 		# The language and synthesizer whose settings the settings ring shows now
 		self._ringLang = None
 		self._ringSynth = None
@@ -357,6 +365,8 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		self._ringRefreshPending = False
 		self._allowLoad = False
 		self._uiInstalled = False
+		self._uiAttempts = 0
+		self._uiRetryPending = False
 		self._synth = None
 		self._lastSynth = None
 		self.confspec = ConfigObj(StringIO(configSpecString), list_values=False, encoding="UTF-8")
@@ -470,6 +480,9 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		for key in ("useUnicodeLanguageDetection", "preloadSynths"):
 			if section[key] != bool(getattr(self, key)):
 				section[key] = bool(getattr(self, key))
+		for key in ("numberMode", "symbolMode"):
+			if section[key] != getattr(self, key):
+				section[key] = getattr(self, key)
 		known = json.dumps(self._encodeSynthLanguages(), sort_keys=True)
 		if (section["synthLanguages"] or "") != known:
 			section["synthLanguages"] = known
@@ -513,6 +526,10 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		for key in ("useUnicodeLanguageDetection", "preloadSynths"):
 			value = section[key]
 			if isinstance(value, bool):
+				setattr(self, key, value)
+		for key in ("numberMode", "symbolMode"):
+			value = section[key]
+			if isinstance(value, str):
 				setattr(self, key, value)
 		self._loadSynthLanguages(section["synthLanguages"])
 		# Languages of the shared scripts
@@ -573,16 +590,32 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		if self._terminated or not _wxReady():
 			return
 		if not self._uiInstalled:
-			try:
-				from . import settingsUi
-				settingsUi.install(SynthDriver)
-				self._uiInstalled = True
-			except Exception:
-				self._uiInstalled = True
-				log.error("AutoLang: unable to add the AutoLang controls to the Speech settings", exc_info=True)
+			self._installUi()
 		self._schedulePreload(PRELOAD_START_DELAY)
 		if self._ringDirty:
 			self._scheduleRingRefresh()
+
+	def _installUi(self):
+		"""Adds AutoLang settings to NVDA's Tools menu. NVDA creates its menus a little after its window system, so this
+		is tried again until it works"""
+		try:
+			from . import settingsUi
+			settingsUi.install(SynthDriver)
+			self._uiInstalled = True
+		except (AttributeError, TypeError):
+			# The menus of NVDA do not exist yet
+			if self._uiAttempts < 60 and not self._uiRetryPending:
+				self._uiAttempts += 1
+				if _callLater(1000, self._retryInstallUi):
+					self._uiRetryPending = True
+		except Exception:
+			self._uiInstalled = True
+			log.error("AutoLang: unable to add AutoLang settings to the Tools menu", exc_info=True)
+
+	def _retryInstallUi(self):
+		self._uiRetryPending = False
+		if not self._terminated and not self._uiInstalled:
+			self._installUi()
 
 	# ------------------------------------------------------------------
 	# Punctuation level
@@ -616,16 +649,14 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 
 	# ------------------------------------------------------------------
 	# Supported settings.
-	# NVDA's Speech settings show only these general settings; the settings of the languages are in AutoLang's own
-	# controls and windows (see settingsUi). The settings ring gets more while it is built (see _refreshRing)
+	# NVDA's Speech settings show only the default language. Everything else is in AutoLang's own window, which is
+	# opened from NVDA's Tools menu (see settingsUi). The settings ring gets more while it is built (see _refreshRing)
 	# ------------------------------------------------------------------
 
 	_languageSetting = DriverSetting("editLang", _("Language to set up"), availableInSettingsRing=True, useConfig=False)
 
 	_generalSettings = (
 		DriverSetting("voice", _("&Default language"), availableInSettingsRing=True),
-		DriverSetting("numberMode", _("Read &numbers in"), availableInSettingsRing=False, defaultVal=NUMBERS_DEFAULT),
-		DriverSetting("symbolMode", _("Read &symbols in"), availableInSettingsRing=False, defaultVal=SYMBOLS_DEFAULT),
 	)
 
 	def _get_supportedSettings(self):
@@ -740,7 +771,7 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 	def _getLangAvailableValues(self, lang, synthName, setting):
 		"""The values of a list setting, as an OrderedDict of StringParameterInfo"""
 		if setting.id == "synth":
-			return OrderedDict((id, StringParameterInfo(id, name)) for id, name in self.getSynthChoices(lang, load=False))
+			return OrderedDict((id, StringParameterInfo(id, name)) for id, name in self.getSynthChoices(lang))
 		if setting.id == "symbolLevel":
 			return OrderedDict((id, StringParameterInfo(id, name)) for id, name in _symbolLevelOptions())
 		if setting.id == "voice":
@@ -869,7 +900,11 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		"""What is known about the languages of the synthesizers, in a form that can be saved"""
 		data = {}
 		for name, languages in self._synthLanguages.items():
-			if name in self._synthLanguagesTime and languages is not False:
+			if name not in self._synthLanguagesTime:
+				continue
+			if languages is False:
+				data[name] = {"languages": [], "failed": True, "time": self._synthLanguagesTime[name]}
+			else:
 				data[name] = {"languages": None if languages is UNKNOWN else sorted(languages), "time": self._synthLanguagesTime[name]}
 		return data
 
@@ -887,23 +922,19 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 			if name in self._synthLanguages or name not in self.availableSynths or not isinstance(entry, dict):
 				continue
 			stamp, languages = entry.get("time"), entry.get("languages")
-			if not isinstance(stamp, (int, float)) or now - stamp > SYNTH_LANGUAGES_MAX_AGE:
+			failed = entry.get("failed") is True
+			maxAge = SYNTH_FAILURE_MAX_AGE if failed else SYNTH_LANGUAGES_MAX_AGE
+			if not isinstance(stamp, (int, float)) or now - stamp > maxAge:
 				continue
-			if languages is None:
+			if failed:
+				self._synthLanguages[name] = False
+			elif languages is None:
 				self._synthLanguages[name] = UNKNOWN
 			elif isinstance(languages, list) and all(isinstance(lang, str) for lang in languages):
 				self._synthLanguages[name] = set(languages)
 			else:
 				continue
 			self._synthLanguagesTime[name] = stamp
-
-	def needsSynthCheck(self, lang):
-		"""True if finding the synthesizers for the language means starting a synthesizer that was not checked yet"""
-		current = self._settings[lang].synth
-		return any(
-			name != current and name not in self._synthLanguages and not self._isFailed(name)
-			for name in self.availableSynths
-		)
 
 	def _computeSynthLanguages(self, name):
 		"""The languages that the voices of the synthesizer speak, or UNKNOWN"""
@@ -916,28 +947,50 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		languages.discard(None)
 		return languages or UNKNOWN
 
-	def _getSynthLanguages(self, name, load):
-		"""Returns a set of languages, UNKNOWN or False (the synthesizer cannot be used)"""
-		if name in self._synthLanguages:
-			return self._synthLanguages[name]
-		if not load:
-			return UNKNOWN
-		if not self.ensureSynthLoaded(name):
-			return False
-		return self._synthLanguages.get(name, UNKNOWN)
-
-	def getSynthChoices(self, lang, load):
-		"""[(id, name)] of the synthesizers that can speak the language. With load=True every synthesizer is started
-		(once) to find out its languages. The synthesizer in use is always in the list"""
+	def getSynthChoices(self, lang):
+		"""[(id, name)] of the synthesizers that can speak the language. This only uses what is already known, so it
+		is instant. A synthesizer whose languages are not known yet is listed, because it may speak the language.
+		The synthesizer in use is always in the list"""
 		current = self._settings[lang].synth
 		choices = []
 		for name, info in self.availableSynths.items():
 			if name != current:
-				languages = self._getSynthLanguages(name, load)
+				languages = self._synthLanguages.get(name, UNKNOWN)
 				if languages is False or (languages is not UNKNOWN and lang not in languages):
 					continue
 			choices.append((name, info.displayName))
 		return choices
+
+	def _probeSynth(self, name):
+		"""Finds out the languages of a synthesizer that is not in use: starts it, reads its voices and stops it"""
+		synth = None
+		try:
+			synth = _getSynthInstance(name)
+			voices = synth.availableVoices
+			languages = {_baseLanguage(getattr(voice, "language", None)) for voice in voices.values()}
+			languages.discard(None)
+			result = languages or UNKNOWN
+		except Exception:
+			log.debugWarning(f"AutoLang: unable to check the languages of the {name} synthesizer", exc_info=True)
+			result = False
+		finally:
+			if synth is not None:
+				try:
+					synth.terminate()
+				except Exception:
+					log.debugWarning(f"AutoLang: unable to stop the {name} synthesizer after checking it", exc_info=True)
+		self._synthLanguages[name] = result
+		self._synthLanguagesTime[name] = time.time()
+
+	def ensureProbing(self):
+		"""Starts finding out the languages of the synthesizers that are not known yet, in the background"""
+		self._fillProbeQueue()
+		self._startChain(0)
+
+	def _fillProbeQueue(self):
+		for name in self.availableSynths:
+			if name not in self._synthLanguages and name not in self._synthCache and name not in self._probeQueue:
+				self._probeQueue.append(name)
 
 	def getVoicesForLanguage(self, synthName, lang):
 		"""The voices of the synthesizer that speak the language. If it reports no languages, or none of its voices
@@ -979,6 +1032,10 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 				fields.append(dict(id=setting.id, kind="check", label=setting.displayName, value=bool(value)))
 			else:
 				options = [(id, info.displayName) for id, info in self._getLangAvailableValues(lang, synthName, setting).items()]
+				if options and setting.id in NONE_SETTINGS:
+					# Nothing chosen for this language: the synthesizer's own value is used
+					options.insert(0, (None, _("None")))
+					value = settings.params.get(setting.id)
 				if options:
 					fields.append(dict(id=setting.id, kind="choice", label=setting.displayName, value=value, options=options))
 
@@ -1002,6 +1059,9 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		defaults = self._synthCache[synthName][1] if synthName in self._synthCache else {}
 		params = dict(settings.params)
 		for id, value in values.items():
+			if value is None and id in NONE_SETTINGS:
+				params.pop(id, None)
+				continue
 			if id == "symbolLevel":
 				settings.symbolLevel = None if value == LEVEL_NVDA else value
 			elif id == "sendLang":
@@ -1017,6 +1077,24 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 					params[id] = checked
 		settings.params = params
 		self._appliedState.pop(synthName, None)
+
+	def getNumberChoices(self):
+		return [(id, info.displayName) for id, info in self.availableNumbermodes.items()]
+
+	def getSymbolChoices(self):
+		return [(id, info.displayName) for id, info in self.availableSymbolmodes.items()]
+
+	def applyMainValues(self, defaultLanguage, numberMode, symbolMode):
+		"""Takes the values of the main AutoLang window"""
+		self.numberMode = numberMode
+		self.symbolMode = symbolMode
+		if defaultLanguage in self.availableVoices and defaultLanguage != self._voice:
+			try:
+				from synthDriverHandler import changeVoice
+				changeVoice(self, defaultLanguage)
+			except Exception:
+				log.debugWarning("AutoLang: unable to change the voice in the usual way", exc_info=True)
+				self._set_voice(defaultLanguage)
 
 	def getScriptFields(self):
 		"""The additional configuration: automatic detection, advance loading and the languages of the shared scripts"""
@@ -1134,14 +1212,18 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 
 	def _schedulePreload(self, delay):
 		"""Loads the synthesizers in advance, one by one while NVDA is idle, so that the first switch to a language
-		does not freeze the screen reader"""
+		does not freeze the screen reader. Afterwards the other synthesizers are checked for their languages"""
 		if not self.preloadSynths or self._terminated:
 			return
 		for lang in [self._voice] + list(self._settings):
 			name = self._settings[lang].synth
 			if name not in self._synthCache and name not in self._preloadQueue:
 				self._preloadQueue.append(name)
-		if not self._preloadQueue or self._preloadRunning:
+		self._fillProbeQueue()
+		self._startChain(delay)
+
+	def _startChain(self, delay):
+		if self._terminated or self._preloadRunning or not (self._preloadQueue or self._probeQueue):
 			return
 		if _callLater(delay, self._preloadStep):
 			self._preloadRunning = True
@@ -1158,17 +1240,19 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		if self._synth is not None or not self.speechQueue.empty():
 			_callLater(PRELOAD_INTERVAL, self._preloadStep)
 			return
-		if not self._preloadQueue:
-			self._preloadRunning = False
-			return
-		name = self._preloadQueue.pop(0)
-		if name not in self._synthCache and not self._isFailed(name):
-			try:
-				self._loadSynth(name)
-			except Exception:
-				self._failedSynths[name] = time.monotonic()
-				log.error(f"AutoLang: unable to load the {name} synthesizer", exc_info=True)
 		if self._preloadQueue:
+			name = self._preloadQueue.pop(0)
+			if name not in self._synthCache and not self._isFailed(name):
+				try:
+					self._loadSynth(name)
+				except Exception:
+					self._failedSynths[name] = time.monotonic()
+					log.error(f"AutoLang: unable to load the {name} synthesizer", exc_info=True)
+		elif self._probeQueue:
+			name = self._probeQueue.pop(0)
+			if name not in self._synthLanguages and name not in self._synthCache:
+				self._probeSynth(name)
+		if self._preloadQueue or self._probeQueue:
 			_callLater(PRELOAD_INTERVAL, self._preloadStep)
 		else:
 			self._preloadRunning = False
@@ -1202,25 +1286,24 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 		return None
 
 	def _applySettings(self, synth, defaultConf, params, lang):
-		# If the synth supports a voice, then we must first set it, since other parameters can be specific to this voice
+		"""Gives the nested synthesizer the settings of the language. A setting that was not chosen gets the
+		synthesizer's own value, so that the settings of another language never stay behind"""
 		# A synthesizer may have a language setting that decides which voices exist, so it comes first
-		for first in ("language", "voice"):
-			value = params.get(first)
-			if value is None or not synth.isSupported(first):
-				continue
-			try:
-				if getattr(synth, first) != value and (first != "voice" or value in synth.availableVoices):
-					setattr(synth, first, value)
-			except Exception:
-				log.debugWarning(f"AutoLang: unable to set {first} of {synth.name}", exc_info=True)
-		if "voice" not in params:
-			# No voice was chosen for this language. Use the first voice that speaks it, if the synthesizer has such voices
-			try:
-				voices = self.getVoicesForLanguage(synth.name, lang)
-				if voices and synth.isSupported("voice") and synth.voice not in voices and len(voices) != len(synth.availableVoices):
-					synth.voice = next(iter(voices))
-			except Exception:
-				log.debugWarning(f"AutoLang: unable to choose a voice of {synth.name}", exc_info=True)
+		if synth.isSupported("language"):
+			self._setSynthValue(synth, "language", params.get("language", defaultConf.get("language")))
+		if synth.isSupported("voice"):
+			voice = params.get("voice")
+			if voice is None:
+				# Not chosen: the synthesizer's own voice, if it speaks this language, else the first voice that does
+				try:
+					voices = self.getVoicesForLanguage(synth.name, lang)
+					default = defaultConf.get("voice")
+					voice = default if (not voices or default in voices) else next(iter(voices))
+				except Exception:
+					log.debugWarning(f"AutoLang: unable to choose a voice of {synth.name}", exc_info=True)
+					voice = defaultConf.get("voice")
+			if voice is not None and voice in synth.availableVoices:
+				self._setSynthValue(synth, "voice", voice)
 		for setting in synth.supportedSettings:
 			if setting.id in ("language", "voice"):
 				continue
@@ -1230,13 +1313,16 @@ class SynthDriver(synthDriverHandler.SynthDriver):
 				val = defaultConf[setting.id]
 			else:
 				continue
-			if val is None:
-				continue
-			try:
-				if getattr(synth, setting.id) != val:
-					setattr(synth, setting.id, val)
-			except Exception:
-				log.debugWarning(f"AutoLang: unable to set {setting.id} of {synth.name}", exc_info=True)
+			self._setSynthValue(synth, setting.id, val)
+
+	def _setSynthValue(self, synth, settingId, value):
+		if value is None:
+			return
+		try:
+			if getattr(synth, settingId) != value:
+				setattr(synth, settingId, value)
+		except Exception:
+			log.debugWarning(f"AutoLang: unable to set {settingId} of {synth.name}", exc_info=True)
 
 	# ------------------------------------------------------------------
 	# Speech

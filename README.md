@@ -13,7 +13,8 @@ AutoLang finds the language of a text from its writing script and reads each par
 - **A different synthesizer for every language.** Use eSpeak NG, IBMTTS (Eloquence), Vocalizer, Windows OneCore, SAPI 5 or any other installed NVDA synthesizer, side by side.
 - **Per-language settings:** voice, variant, pitch, rate, volume, punctuation level, and every setting that is specific to the chosen synthesizer (inflection, rate boost, head size, roughness, breathiness and so on). Only the settings that the synthesizer really has are shown.
 - **Only what fits the language.** For a language, only the synthesizers that can speak it are offered, and only the voices that speak it.
-- **Simple settings in NVDA's Speech panel,** with separate windows for the synthesizer settings of a language and for the additional language script configuration (automatic detection, loading in advance, and the languages of shared scripts such as Latin and Devanagari).
+- **A settings window of its own** in NVDA's Tools menu, with separate windows for the synthesizer settings of a language and for the additional language script configuration (automatic detection, loading in advance, and the languages of shared scripts such as Latin and Devanagari). NVDA's own Speech settings stay as they are.
+- **"None" for voice and variant:** leave them unchosen and AutoLang uses the synthesizer's own voice and variant, or the first voice that speaks the language.
 - **Numbers and symbols:** choose whether numbers and the names of symbols such as comma are read in the default language or in the language of the text around them.
 - **NVDA settings ring support:** change the synthesizer, voice, variant, pitch, rate and volume of a language quickly from the keyboard.
 - **No pauses.** Synthesizers are started in the background after NVDA starts, so the first switch to a language is instant. A synthesizer that fails to start never stops NVDA from speaking.
@@ -32,12 +33,12 @@ AutoLang finds the language of a text from its writing script and reads each par
 
 ## Quick start
 
-1. Press `NVDA+Control+V` to open the Speech settings.
+1. Open the NVDA menu (`NVDA+N`), then **Tools**, then **AutoLang settings...**.
 2. In **Language to set up**, choose a language, for example Kannada.
 3. In **Synthesizer for this language**, choose the synthesizer.
 4. Press **Voice, rate, pitch and other settings...** and choose the voice and the other settings in the window that opens. Press OK.
 5. Repeat for every language you read. Press **Additional language script configuration...** to choose which language is used for Latin, Cyrillic, Arabic, Devanagari and CJK text, and to switch automatic detection and loading in advance on or off.
-6. Press OK in the Speech settings.
+6. Press OK in the AutoLang settings window.
 
 The full guide is in [`addon/doc/en/readme.md`](addon/doc/en/readme.md).
 
@@ -49,13 +50,13 @@ AutoLang is an NVDA synthesizer driver. It does not make sound by itself. It spl
 | --- | --- | --- |
 | Driver | `addon/synthDrivers/AutoLang/__init__.py` | Splits speech by language, runs the nested synthesizers, keeps the settings, builds the settings ring |
 | Language detection | `addon/synthDrivers/AutoLang/languageDetection.py`, `scripts.py` | Finds the language of text from the Unicode script of its characters |
-| Settings windows | `addon/synthDrivers/AutoLang/settingsUi.py` | The controls in the Speech panel and the two settings windows |
+| Settings windows | `addon/synthDrivers/AutoLang/settingsUi.py` | The Tools menu item, the AutoLang settings window and the two windows that open from it |
 
 Design decisions worth knowing:
 
-- NVDA starts the synthesizer *before* its window system exists. AutoLang therefore does nothing with windows at that time, and starts its background work and its Speech panel controls later.
-- The list of settings that NVDA reads from the driver (`supportedSettings`) stays fixed for NVDA's Speech panel. The per-language settings live in AutoLang's own windows, so NVDA's panel never needs to be rebuilt. Only the settings ring gets a longer list, and only while it is being built.
-- A synthesizer's languages are read from the `language` of its voices. A synthesizer that does not report languages is offered for every language. To avoid starting every synthesizer each time, what is learned is saved in the configuration and trusted for a week.
+- NVDA starts the synthesizer *before* its window system exists. AutoLang therefore does nothing with windows at that time, and adds its Tools menu item and starts its background work later.
+- The list of settings that NVDA reads from the driver (`supportedSettings`) holds only the default language. The per-language settings live in AutoLang's own windows (opened from the Tools menu), so NVDA's Speech panel never needs to be rebuilt. Only the settings ring gets a longer list, and only while it is being built.
+- A synthesizer's languages are read from the `language` of its voices. A synthesizer that does not report languages is offered for every language. The synthesizers that are not in use are started once in the background, one by one, then stopped. What is learned is saved in the configuration and trusted for a week, so the synthesizer list of the window is always instant.
 
 ## Building
 
